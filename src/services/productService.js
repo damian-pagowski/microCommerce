@@ -26,6 +26,7 @@ const getProductById = async (productId) => {
     }
     return product;
   } catch (error) {
+    if (error instanceof NotFoundError) throw error;
     console.error(`Error fetching product with ID ${productId}:`, error.message);
     throw new DatabaseError(`Failed to fetch product with ID: ${productId}`, error);
   }
@@ -65,6 +66,7 @@ const updateProduct = async (productId, productData) => {
     await updateProductCache();
     return updatedProduct;
   } catch (error) {
+    if (error instanceof NotFoundError) throw error;
     console.error(`Error updating product with ID ${productId}:`, error.message);
     throw new DatabaseError(`Failed to update product with ID: ${productId}`, error);
   }
@@ -83,6 +85,7 @@ const deleteProduct = async (productId) => {
     await updateProductCache();
     return deletedProduct;
   } catch (error) {
+    if (error instanceof NotFoundError) throw error;
     console.error(`Error deleting product with ID ${productId}:`, error.message);
     throw new DatabaseError(`Failed to delete product with ID: ${productId}`, error);
   }

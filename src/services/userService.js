@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const { ValidationError, UnauthorizedError, DatabaseError, NotFoundError } = require('../utils/errors');
+const { ValidationError, UnauthorizedError, NotFoundError } = require('../utils/errors');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 const TOKEN_EXPIRATION = '7d';

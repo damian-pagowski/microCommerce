@@ -1,4 +1,3 @@
-const fastifyPlugin = require('fastify-plugin');
 const { createOrder, getOrderById } = require('../services/orderService');
 const { createOrderSchema, orderIdSchema } = require('../validation/orderValidation');
 const { ValidationError } = require('../utils/errors');

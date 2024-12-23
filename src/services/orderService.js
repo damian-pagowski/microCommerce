@@ -41,6 +41,7 @@ const handleOrderFailure = async (orderId, reason) => {
         await order.save();
         console.log(`Order ${orderId} marked as failed. Reason: ${reason}`);
     } catch (error) {
+        if (error instanceof NotFoundError) throw error;
         console.error('Failed to mark order as failed:', error.message);
         throw new DatabaseError('Failed to update order status to failed', error);
     }
@@ -57,7 +58,7 @@ const handlePaymentSuccess = async (payload) => {
             throw new NotFoundError('Order', orderId);
         }
         // Only EUR payments               
-        if (!(amount == order.totalPrice && currency == "EUR")) {
+        if (!(amount == order.totalPrice && currency == 'EUR')) {
             // Insufficient payment
             order.status = 'failed';
             order.failureReason = `Insufficient payment. Paid: ${amount} ${currency}, Expected: ${order.totalPrice} EUR`;

@@ -27,7 +27,7 @@ const processInventoryMessage = async (message) => {
       console.log(`Rolled back ${quantity} units of product ${productId}`);
     } else {
       console.warn('Unknown message type:', type);
-      return;
+      throw new InventoryProcessingError('Unknown message type:', type);
     }
 
     await inventory.save();
@@ -38,12 +38,15 @@ const processInventoryMessage = async (message) => {
       const newPayload = {
         orderId: payload.orderId,
         reason: error.message,
-      }
+      };
       await publishMessage('orders.queue', {
         type: 'ORDER_FAILED',
         payload: newPayload,
       });
     }
+    if (error instanceof InventoryNotFoundError || error instanceof InventoryQuantityError){
+      throw error;
+    } 
     throw new InventoryProcessingError(error.message);
   }
 };
@@ -57,7 +60,7 @@ const getInventoryByProductId = async (productId) => {
     return inventory;
   } catch (error) {
     if (error instanceof InventoryNotFoundError || error instanceof InventoryQuantityError) {
-      throw error
+      throw error;
     }
     throw new InventoryProcessingError(`Failed to fetch inventory for product ${productId}: ${error.message}`);
   }

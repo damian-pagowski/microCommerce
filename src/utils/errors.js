@@ -28,7 +28,62 @@ class DatabaseError extends AppError {
     }
 }
 
+class InventoryNotFoundError extends Error {
+    constructor(productId) {
+        super(`Inventory for product ${productId} not found`);
+        this.name = 'InventoryNotFoundError';
+        this.statusCode = 404;
+    }
+}
+
+class InventoryProcessingError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'InventoryProcessingError';
+        this.statusCode = 500;
+    }
+}
+
+class InventoryQuantityError extends Error {
+    constructor(productId, available, requested) {
+        super(`Insufficient stock for product ${productId}. Available: ${available}, Requested: ${requested}`);
+        this.name = 'InventoryQuantityError';
+        this.statusCode = 400;
+    }
+}
+
+class ValidationError extends Error {
+    constructor(message, fields = []) {
+        super(message);
+        this.name = 'ValidationError';
+        this.statusCode = 400;
+        this.fields = fields;
+    }
+}
+
+class PaymentError extends Error {
+    constructor(message, reason = '') {
+        super(message);
+        this.name = 'PaymentError';
+        this.statusCode = 402;
+        this.reason = reason;
+    }
+}
+
+class UnauthorizedError extends AppError {
+    constructor(message = 'Unauthorized access') {
+        super(message, 401);
+        this.type = 'unauthorized_error';
+    }
+}
+
 module.exports = {
+    UnauthorizedError,
+    ValidationError, 
+    PaymentError,
+    InventoryNotFoundError,
+    InventoryProcessingError,
+    InventoryQuantityError,
     AppError,
     NotFoundError,
     DatabaseError,

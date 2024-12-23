@@ -1,46 +1,50 @@
 const { publishMessage } = require('../queues/queueService');
+const { PaymentError } = require('../utils/errors');
 
 const processPayment = async ({ orderId, amount, currency, cardDetails }) => {
-  // Simulate payment processing logic
-  const { name } = cardDetails;
 
-  // if (name.toLowerCase() === 'broke user') {
-  //   return {
-  //     status: 'rejected',
-  //     reason: 'insufficient funds',
-  //     orderId,
-  //   };
-  // }
+  /* TODO add check for curr and amount */
+  try {
+    const { name } = cardDetails;
 
-  if (name.toLowerCase() === 'broke user') {
-    await publishMessage('payments.queue', {
-      type: 'PAYMENT_FAILED',
-      payload: {
+    if (!name) {
+      throw new PaymentError('Invalid card details', 'Cardholder name is missing');
+    }
+
+    if (name.toLowerCase() === 'broke user') {
+      await publishMessage('payments.queue', {
+        type: 'PAYMENT_FAILED',
+        payload: {
+          orderId,
+          reason: 'Insufficient funds',
+          amount,
+          currency,
+        },
+      });
+
+      return {
+        status: 'rejected',
+        reason: 'Insufficient funds',
         orderId,
-        reason: 'insufficient funds',
-      },
+      };
+    }
+
+    // Simulate successful payment
+    const paymentId = `payment_${Math.random().toString(36).substring(7)}`;
+    await publishMessage('payments.queue', {
+      type: 'PAYMENT_SUCCESS',
+      payload: { orderId, amount, currency },
     });
-  
+
     return {
-      status: 'rejected',
-      reason: 'insufficient funds',
+      status: 'success',
+      paymentId,
       orderId,
     };
+  } catch (error) {
+    console.error('Error in processPayment:', error.message);
+    throw error instanceof PaymentError ? error : new PaymentError('Payment processing failed');
   }
-
-
-  // Simulate successful payment
-  const paymentId = `payment_${Math.random().toString(36).substring(7)}`;
-  await publishMessage('payments.queue', {
-    type: 'PAYMENT_SUCCESS',
-    payload: { orderId },
-  });
-
-  return {
-    status: 'success',
-    paymentId,
-    orderId,
-  };
 };
 
 module.exports = { processPayment };

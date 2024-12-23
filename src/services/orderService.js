@@ -1,132 +1,165 @@
 const Order = require('../models/order');
-const { DatabaseError, ValidationError } = require('../utils/errors');
+const { DatabaseError, ValidationError, NotFoundError } = require('../utils/errors');
 const { publishMessage } = require('../queues/queueService');
 const redisClient = require('./redisClient');
 
-
-const handlePayment = async (msg) => {
-    const { type, payload } = msg; 
+/**
+ * Handle payment messages
+ */
+const processPaymentMessages = async (msg) => {
+    const { type, payload } = msg;
     switch (type) {
-      case 'PAYMENT_SUCCESS':
-        await handlePaymentSuccess(payload.orderId);
-        console.log(`Order ${payload.orderId} marked as paid.`);
-        break;
-      case 'PAYMENT_FAILED':
-        await handlePaymentFailure(payload.orderId, payload.reason);
-        console.log(`Payment failed for order ${payload.orderId}: ${payload.reason}`);
-        break;
-      default:
+        case 'PAYMENT_SUCCESS':
+            await handlePaymentSuccess(payload);
+            break;
+        case 'PAYMENT_FAILED':
+            await handlePaymentFailure(payload);
+            break;
+        default:
+            console.warn(`Unhandled message type: ${type}`);
+    }
+};
+
+const processOrderMessages = async (msg) => {
+    const { type, payload } = msg;
+    if (type === 'ORDER_FAILED') {
+        const { orderId, reason } = payload;
+        await handleOrderFailure(orderId, reason);
+    } else {
         console.warn(`Unhandled message type: ${type}`);
     }
-  };
+};
 
-  const handlePaymentSuccess = async (orderId) => {
+const handleOrderFailure = async (orderId, reason) => {
     try {
-      const order = await Order.findById(orderId);
-      if (!order) {
-        throw new NotFoundError('Order', orderId);
-      }
+        const order = await Order.findById(orderId);
+        if (!order) {
+            throw new NotFoundError('Order', orderId);
+        }
+        order.status = 'failed';
+        order.failureReason = reason;
+        await order.save();
+        console.log(`Order ${orderId} marked as failed. Reason: ${reason}`);
+    } catch (error) {
+        console.error('Failed to mark order as failed:', error.message);
+        throw new DatabaseError('Failed to update order status to failed', error);
+    }
+};
+
+/**
+ * Handle successful payment
+ */
+const handlePaymentSuccess = async (payload) => {
+    try {
+        const { orderId, amount, currency } = payload;
+        const order = await Order.findById(orderId);
+        if (!order) {
+            throw new NotFoundError('Order', orderId);
+        }
+        // Only EUR payments               
+        if (!(amount == order.totalPrice && currency == "EUR")) {
+            // Insufficient payment
+            order.status = 'failed';
+            order.failureReason = `Insufficient payment. Paid: ${amount} ${currency}, Expected: ${order.totalPrice} EUR`;
+            await order.save();
+
+            console.error(
+                `Payment for order ${orderId} failed. Paid: ${amount}, Expected: ${order.totalPrice}`
+            );
+
+            return { success: false, message: `Payment insufficient for order ${orderId}` };
+        }
+
+        // Full payment success
         order.status = 'paid';
-      await order.save();
-  
-      console.log(`Order ${orderId} successfully updated to 'paid' status.`);
-      return { success: true, message: `Order ${orderId} marked as paid.` };
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        console.error(`Order not found: ${orderId}`);
-        throw error;
-      }
-      console.error(`Failed to update order ${orderId}:`, error);
-      throw new DatabaseError(`Failed to update order ${orderId} to 'paid'`, error);
-    }
-  };
+        await order.save();
 
-  const handlePaymentFailure = async (orderId, reason) => {
-    try {
-      const order = await Order.findById(orderId);
-      if (!order) {
+        console.log(`Order ${orderId} successfully updated to 'paid' status.`);
+        return { success: true, message: `Order ${orderId} marked as paid.` };
+    } catch (error) {
+        if (error instanceof NotFoundError) {
+            console.error(`Order not found: ${orderId}`);
+            throw error;
+        }
+        console.error(`Failed to update order ${orderId}:`, error);
+        throw new DatabaseError(`Failed to update order ${orderId} to 'paid'`, error);
+    }
+};
+/**
+ * Handle failed payment
+ */
+const handlePaymentFailure = async (payload) => {
+    const { orderId, reason } = payload;
+
+    const order = await Order.findById(orderId);
+    if (!order) {
         throw new NotFoundError('Order', orderId);
-      }  
-      order.status = 'failed';
-      order.failureReason = reason;
-      await order.save();
-  
-      console.log(`Order ${orderId} marked as failed. Reason: ${reason}`);
-      return { success: true, message: `Order ${orderId} marked as failed.` };
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        console.error(`Order not found: ${orderId}`);
-        throw error;
-      }
-      console.error(`Failed to update order ${orderId} to 'failed':`, error);
-      throw new DatabaseError(`Failed to update order ${orderId} to 'failed'`, error);
     }
-  };
+    order.status = 'failed';
+    order.failureReason = reason;
+    await order.save();
+    console.log(`Order ${orderId} marked as failed. Reason: ${reason}`);
+};
 
-async function reserveStock(items) {
+/**
+ * Reserve stock for order
+ */
+const reserveStock = async (items, orderId) => {
     for (const item of items) {
         await publishMessage('inventory.queue', {
             type: 'RESERVE_STOCK',
-            payload: { productId: item.productId, quantity: item.quantity },
+            payload: { productId: item.productId, quantity: item.quantity, orderId },
         });
     }
-}
+};
+
 /**
  * Create a new order
- * @param {string} username - The username of the customer
- * @param {array} items - The list of items to order
  */
 const createOrder = async (username, items) => {
     const productPriceMap = {};
 
     for (const item of items) {
         const cachedProduct = await redisClient.get(`product:${item.productId}`);
-        if (!cachedProduct) throw new Error(`Product ${item.productId} not found in cache`);
-
+        if (!cachedProduct) {
+            throw new ValidationError(`Product ${item.productId} not found in cache`);
+        }
         const product = JSON.parse(cachedProduct);
         productPriceMap[item.productId] = product.price;
         item.price = product.price;
-        item.name = product.name
+        item.name = product.name;
     }
 
-    const totalPrice = items.reduce((sum, item) => sum + item.quantity * productPriceMap[item.productId], 0);
+    const totalPrice = Math.round(
+        items.reduce(
+            (sum, item) => sum + item.quantity * productPriceMap[item.productId],
+            0
+        ) * 100
+    ) / 100;
+
     const order = new Order({ username, items, totalPrice, status: 'pending' });
+    const orderId =  order._id.toString();
+    await reserveStock(items, orderId); // Throws error if stock reservation fails
+    await order.save();
 
-    try {
-        // Publish stock reservation requests
-        await reserveStock(items);
-        await order.save();
-        console.log('Order created:', order);
-        return order;
-    } catch (error) {
-        console.error('Error creating order:', error.message);
-        throw new DatabaseError('Failed to create order', error);
-    }
+    console.log('Order created:', order);
+    return order;
 };
 
+/**
+ * Get order by ID
+ */
 const getOrderById = async (orderId, username) => {
-    try {
-        const order = await Order.findOne({ _id: orderId, username });
-        if (!order) {
-            throw new NotFoundError('Order', orderId);
-        }
-        return order;
-    } catch (error) {
-        if (error instanceof NotFoundError) {
-            throw error;
-        }
-        throw new DatabaseError('Failed to fetch order by ID', 'getOrderById', {
-            orderId,
-            username,
-            originalError: error,
-        });
+    const order = await Order.findOne({ _id: orderId, username });
+    if (!order) {
+        throw new NotFoundError('Order', orderId);
     }
+    return order;
 };
 
 module.exports = {
     createOrder,
     getOrderById,
-    handlePayment
+    processPaymentMessages,
+    processOrderMessages
 };
-
-

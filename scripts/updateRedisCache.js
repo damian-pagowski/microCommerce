@@ -4,7 +4,6 @@ const Product = require('../src/models/product');
 require('dotenv').config();
 
 (async () => {
-  // await redisClient();
   try {
     // Connect to MongoDB
     await mongoose.connect(process.env.MONGO_URI);
@@ -12,7 +11,7 @@ require('dotenv').config();
     // Update Redis cache
     const products = await Product.find({}, { productId: 1, price: 1, name: 1, _id: 0 });
     for (const product of products) {
-      await redisClient.set(`product:${product.productId}`, JSON.stringify(product), { EX: 3600 });
+      await redisClient.set(`product:${product.productId}`, JSON.stringify(product), { EX: 360000 });
     }
     console.log('Redis cache updated with product data.');
 

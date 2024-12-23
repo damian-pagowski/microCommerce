@@ -3,7 +3,7 @@ async function swagger(fastify, options) {
       routePrefix: '/docs',
       swagger: {
         info: {
-          title: 'Microservice API',
+          title: 'MicroCommerce',
           description: 'API Documentation',
           version: '1.0.0',
         },

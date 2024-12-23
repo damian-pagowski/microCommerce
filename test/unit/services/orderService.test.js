@@ -7,7 +7,7 @@ const {
 
 const { publishMessage } = require('../../../src/queues/queueService');
 const Order = require('../../../src/models/order');
-const redisClient = require('../../../src/services/redisClient');
+const redisClient = require('../../../src/clients/redisClient');
 const { NotFoundError, ValidationError } = require('../../../src/utils/errors');
 
 jest.mock('../../../src/queues/queueService', () => ({
@@ -15,7 +15,7 @@ jest.mock('../../../src/queues/queueService', () => ({
 }));
 
 jest.mock('../../../src/models/order');
-jest.mock('../../../src/services/redisClient', () => {
+jest.mock('../../../src/clients/redisClient', () => {
 
     return {
         connect: jest.fn(() => Promise.resolve()),

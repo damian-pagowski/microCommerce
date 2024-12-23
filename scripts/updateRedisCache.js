@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
-const redisClient = require('../src/services/redisClient');
+const redisClient = require('../src/clients/redisClient');
 const Product = require('../src/models/product');
 require('dotenv').config();
+const { getLogger } = require('../utils/logger');
+const logger = getLogger();
 
 (async () => {
   try {
@@ -13,11 +15,10 @@ require('dotenv').config();
     for (const product of products) {
       await redisClient.set(`product:${product.productId}`, JSON.stringify(product), { EX: 360000 });
     }
-    console.log('Redis cache updated with product data.');
-
+    logger.info('Redis cache updated with product data.');
     process.exit(0);
   } catch (err) {
-    console.error('Error updating Redis cache:', err);
+    logger.console.error('Error updating Redis cache:', err);
     process.exit(1);
   }
 })();

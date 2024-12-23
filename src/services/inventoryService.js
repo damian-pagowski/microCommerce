@@ -1,4 +1,8 @@
 const Inventory = require('../models/inventory');
+
+const { getLogger } = require('../utils/logger');
+const logger = getLogger();
+
 const {
   InventoryNotFoundError,
   InventoryProcessingError,
@@ -21,19 +25,19 @@ const processInventoryMessage = async (message) => {
         throw new InventoryQuantityError(productId, inventory.quantity, quantity);
       }
       inventory.quantity -= quantity;
-      console.log(`Reserved ${quantity} units of product ${productId}`);
+      logger.info(`Reserved ${quantity} units of product ${productId}`);
     } else if (type === 'ROLLBACK_STOCK') {
       inventory.quantity += quantity;
-      console.log(`Rolled back ${quantity} units of product ${productId}`);
+      logger.info(`Rolled back ${quantity} units of product ${productId}`);
     } else {
-      console.warn('Unknown message type:', type);
+      logger.error('Unknown message type:', type);
       throw new InventoryProcessingError('Unknown message type:', type);
     }
 
     await inventory.save();
-    console.log(`Inventory updated for product ${productId}`);
+    logger.info(`Inventory updated for product ${productId}`);
   } catch (error) {
-    console.error('Error processing inventory message:', error.message);
+    logger.error('Error processing inventory message:', error.message);
     if (type === 'RESERVE_STOCK' && payload.orderId) {
       const newPayload = {
         orderId: payload.orderId,

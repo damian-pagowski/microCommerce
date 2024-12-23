@@ -1,5 +1,7 @@
 const { publishMessage } = require('../queues/queueService');
 const { PaymentError } = require('../utils/errors');
+const { getLogger } = require('../utils/logger');
+const logger = getLogger();
 
 const processPayment = async ({ orderId, amount, currency, cardDetails }) => {
 
@@ -42,7 +44,7 @@ const processPayment = async ({ orderId, amount, currency, cardDetails }) => {
       orderId,
     };
   } catch (error) {
-    console.error('Error in processPayment:', error.message);
+    logger.error('Error in processPayment:', error.message);
     throw error instanceof PaymentError ? error : new PaymentError('Payment processing failed');
   }
 };

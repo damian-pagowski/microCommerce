@@ -1,7 +1,9 @@
 const Order = require('../models/order');
 const { DatabaseError, ValidationError, NotFoundError } = require('../utils/errors');
 const { publishMessage } = require('../queues/queueService');
-const redisClient = require('./redisClient');
+const redisClient = require('../clients/redisClient');
+const { getLogger } = require('../utils/logger');
+const logger = getLogger();
 
 /**
  * Handle payment messages
@@ -39,10 +41,10 @@ const handleOrderFailure = async (orderId, reason) => {
         order.status = 'failed';
         order.failureReason = reason;
         await order.save();
-        console.log(`Order ${orderId} marked as failed. Reason: ${reason}`);
+        logger.info(`Order ${orderId} marked as failed. Reason: ${reason}`);
     } catch (error) {
         if (error instanceof NotFoundError) throw error;
-        console.error('Failed to mark order as failed:', error.message);
+        logger.error('Failed to mark order as failed:', error.message);
         throw new DatabaseError('Failed to update order status to failed', error);
     }
 };
@@ -64,8 +66,8 @@ const handlePaymentSuccess = async (payload) => {
             order.failureReason = `Insufficient payment. Paid: ${amount} ${currency}, Expected: ${order.totalPrice} EUR`;
             await order.save();
 
-            console.error(
-                `Payment for order ${orderId} failed. Paid: ${amount}, Expected: ${order.totalPrice}`
+            logger.error(
+                `Payment for order ${orderId} failed. Paid: ${amount} ${currency}, Expected: ${order.totalPrice} EUR`
             );
 
             return { success: false, message: `Payment insufficient for order ${orderId}` };
@@ -75,14 +77,14 @@ const handlePaymentSuccess = async (payload) => {
         order.status = 'paid';
         await order.save();
 
-        console.log(`Order ${orderId} successfully updated to 'paid' status.`);
+        logger.info(`Order ${orderId} successfully updated to 'paid' status.`);
         return { success: true, message: `Order ${orderId} marked as paid.` };
     } catch (error) {
         if (error instanceof NotFoundError) {
-            console.error(`Order not found: ${orderId}`);
+            logger.error(`Order not found: ${orderId}`);
             throw error;
         }
-        console.error(`Failed to update order ${orderId}:`, error);
+        logger.error(`Failed to update order ${orderId}:`, error);
         throw new DatabaseError(`Failed to update order ${orderId} to 'paid'`, error);
     }
 };
@@ -99,7 +101,7 @@ const handlePaymentFailure = async (payload) => {
     order.status = 'failed';
     order.failureReason = reason;
     await order.save();
-    console.log(`Order ${orderId} marked as failed. Reason: ${reason}`);
+    logger.info(`Order ${orderId} marked as failed. Reason: ${reason}`);
 };
 
 /**
@@ -143,7 +145,7 @@ const createOrder = async (username, items) => {
     await reserveStock(items, orderId); // Throws error if stock reservation fails
     await order.save();
 
-    console.log('Order created:', order);
+    logger.info('Order created:', order);
     return order;
 };
 

@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
+const { getLogger } = require('../utils/logger');
+const logger = getLogger();
 
 async function mongoosePlugin(fastify, options) {
   try {
     await mongoose.connect(process.env.MONGO_URI);
-    fastify.log.info('Connected to MongoDB');
+    logger.info('Connected to MongoDB');
   } catch (err) {
-    fastify.log.error('MongoDB connection failed:', err);
+    logger.error('MongoDB connection failed:', err);
     process.exit(1);
   }
 }

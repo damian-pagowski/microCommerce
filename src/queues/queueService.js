@@ -1,4 +1,6 @@
 const amqp = require('amqplib');
+const { getLogger } = require('../utils/logger');
+const logger = getLogger();
 
 let channel = null;
 
@@ -9,9 +11,9 @@ const connectQueue = async () => {
   try {
     const connection = await amqp.connect(process.env.RABBITMQ_URL);
     channel = await connection.createChannel();
-    console.log('RabbitMQ connected and channel created.');
+    logger.info('RabbitMQ connected and channel created.');
   } catch (error) {
-    console.error('Failed to connect to RabbitMQ:', error);
+    logger.error('Failed to connect to RabbitMQ:', error);
     throw error;
   }
 };
@@ -31,9 +33,9 @@ const publishMessage = async (queueName, message) => {
     channel.sendToQueue(queueName, Buffer.from(JSON.stringify(message)), {
       persistent: true,
     });
-    console.log(`Message published to queue ${queueName}:`, message);
+    logger.info(`Message published to queue ${queueName}:`, message);
   } catch (error) {
-    console.error('Failed to publish message:', error);
+    logger.error('Failed to publish message:', error);
     throw error;
   }
 };
@@ -60,7 +62,7 @@ const consumeMessage = async (queueName, onMessage) => {
             await onMessage(messageContent);
             channel.ack(msg); // Acknowledge message processing
           } catch (err) {
-            console.error('Failed to process message:', err);
+            logger.error('Failed to process message:', err);
             channel.nack(msg, false, false); // Reject message without requeue
           }
         }
@@ -68,9 +70,9 @@ const consumeMessage = async (queueName, onMessage) => {
       { noAck: false }
     );
 
-    console.log(`Consuming messages from queue ${queueName}`);
+    logger.info(`Consuming messages from queue ${queueName}`);
   } catch (error) {
-    console.error('Failed to consume messages:', error);
+    logger.error('Failed to consume messages:', error);
     throw error;
   }
 };

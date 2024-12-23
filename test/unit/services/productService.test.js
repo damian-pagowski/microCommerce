@@ -1,11 +1,11 @@
 const { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, getProductPriceFromCache } = require('../../../src/services/productService');
 
 const Product = require('../../../src/models/product');
-const redisClient = require('../../../src/services/redisClient');
+const redisClient = require('../../../src/clients/redisClient');
 const { NotFoundError, DatabaseError } = require('../../../src/utils/errors');
 
 jest.mock('../../../src/models/product');
-jest.mock('../../../src/services/redisClient', () => {
+jest.mock('../../../src/clients/redisClient', () => {
 
     return {
         connect: jest.fn(() => Promise.resolve()),

@@ -1,6 +1,8 @@
 const Product = require('../models/product');
-const redisClient = require('./redisClient');
+const redisClient = require('../clients/redisClient');
 const { NotFoundError, DatabaseError } = require('../utils/errors');
+const { getLogger } = require('../utils/logger');
+const logger = getLogger();
 
 /**
  * Fetch all products from the database
@@ -9,7 +11,7 @@ const getAllProducts = async () => {
   try {
     return await Product.find({}, { __v: 0 });
   } catch (error) {
-    console.error('Error fetching all products:', error.message);
+    logger.error('Error fetching all products:', error.message);
     throw new DatabaseError('Failed to fetch products', error);
   }
 };
@@ -27,7 +29,7 @@ const getProductById = async (productId) => {
     return product;
   } catch (error) {
     if (error instanceof NotFoundError) throw error;
-    console.error(`Error fetching product with ID ${productId}:`, error.message);
+    logger.error(`Error fetching product with ID ${productId}:`, error.message);
     throw new DatabaseError(`Failed to fetch product with ID: ${productId}`, error);
   }
 };
@@ -43,7 +45,7 @@ const createProduct = async (productData) => {
     await updateProductCache();
     return savedProduct;
   } catch (error) {
-    console.error('Error creating product:', error.message);
+    logger.error('Error creating product:', error.message);
     throw new DatabaseError('Failed to create product', error);
   }
 };
@@ -67,7 +69,7 @@ const updateProduct = async (productId, productData) => {
     return updatedProduct;
   } catch (error) {
     if (error instanceof NotFoundError) throw error;
-    console.error(`Error updating product with ID ${productId}:`, error.message);
+    logger.error(`Error updating product with ID ${productId}:`, error.message);
     throw new DatabaseError(`Failed to update product with ID: ${productId}`, error);
   }
 };
@@ -86,7 +88,7 @@ const deleteProduct = async (productId) => {
     return deletedProduct;
   } catch (error) {
     if (error instanceof NotFoundError) throw error;
-    console.error(`Error deleting product with ID ${productId}:`, error.message);
+    logger.error(`Error deleting product with ID ${productId}:`, error.message);
     throw new DatabaseError(`Failed to delete product with ID: ${productId}`, error);
   }
 };
@@ -104,9 +106,9 @@ const updateProductCache = async () => {
         { EX: 3600 } // Cache expires in 1 hour
       );
     }
-    console.log('Product cache updated');
+    logger.info('Product cache updated');
   } catch (error) {
-    console.error('Error updating product cache:', error.message);
+    logger.error('Error updating product cache:', error.message);
   }
 };
 
@@ -119,7 +121,7 @@ const getProductPriceFromCache = async (productId) => {
     const cachedProduct = await redisClient.get(`product:${productId}`);
     return cachedProduct ? JSON.parse(cachedProduct).price : null;
   } catch (error) {
-    console.error('Error fetching product price from cache:', error.message);
+    logger.error('Error fetching product price from cache:', error.message);
     return null;
   }
 };

@@ -4,15 +4,50 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-    
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
+            "name": "inventory",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/server.js"
+            "program": "${workspaceFolder}/services/inventory/server.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "order",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/services/order/server.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "payment",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/services/payment/server.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "product",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/services/product/server.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "user",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/services/user/server.js"
         }
     ]
 }

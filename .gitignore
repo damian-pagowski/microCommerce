@@ -9,43 +9,17 @@ logs/
 *.log
 *.tflite
 
-# Runtime data
-pids/
-*.pid
-*.pid.lock
-
 # dotenv environment variables
 .env
 .env.local
 .env.*.local
 
 # Editor & IDE settings
-.idea/
 .vscode/
-*.swp
-*.swo
-
-# MacOS files
-.DS_Store
-.AppleDouble
-.LSOverride
 
 # Coverage
 coverage/
 
-# Test artifacts
-test-results/
-*.xml
-*.json
-
-# Build files
-dist/
-build/
-
 # Fastify cache (if applicable)
 .cache/
 
-# Other OS files
-Thumbs.db
-ehthumbs.db
-Desktop.ini

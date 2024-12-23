@@ -2,7 +2,7 @@ require('dotenv').config();
 const fastify = require('fastify')({ logger: true });
 const fastifyJWT = require('fastify-jwt');
 const corsPlugin = require('./src/plugins/cors');
-const swaggerPlugin = require('./src/plugins/swagger');
+// const swaggerPlugin = require('./src/plugins/swagger');
 const mongoosePlugin = require('./src/plugins/mongoose');
 const productRoutes = require('./src/routes/productRoutes');
 const inventoryRoutes = require('./src/routes/inventoryRoutes');
@@ -41,18 +41,16 @@ fastify.setErrorHandler((error, request, reply) => {
     statusCode,
     message: error.message || 'An unexpected error occurred',
   };
-
-  if (error.validation) {
-    response.details = error.validation;
+  if (error.fields) {
+    response.details = error.fields;
   }
-
-  fastify.log.error(error); // Log error for debugging
+  fastify.log.error(error);
   reply.status(statusCode).send(response);
 });
 
 // Register Plugins
 fastify.register(corsPlugin);
-fastify.register(swaggerPlugin);
+// fastify.register(swaggerPlugin);
 fastify.register(mongoosePlugin);
 fastify.register(fastifyJWT, {
   secret: JWT_SECRET,

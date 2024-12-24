@@ -30,9 +30,9 @@
 
 ### Prerequisites
 
-- Node.js installed
-- MongoDB Atlas account
-- CloudAMQP account for RabbitMQ
+- **Node.js** installed
+- **MongoDB Atlas** account
+- **CloudAMQP** account for RabbitMQ
 
 ## Running Microservices with Docker
 
@@ -41,18 +41,18 @@
     - Docker installed on your machine
     - .env file containing required environment variables
 
-.env File Example
+   **.env** File Example
 
 Create a .env file in the root directory with the following structure:
 
- ```bash
+   ```bash
    MONGO_URI=your-mongo-uri
-NODE_ENV=development
-RABBITMQ_URL=your-rabbitmq-url
-JWT_SECRET=your-jwt-secret
-REDIS_HOST=your-redis-host
-REDIS_PORT=your-redis-port
-REDIS_PASSWORD=your-redis-password
+   NODE_ENV=development
+   RABBITMQ_URL=your-rabbitmq-url
+   JWT_SECRET=your-jwt-secret
+   REDIS_HOST=your-redis-host
+   REDIS_PORT=your-redis-port
+   REDIS_PASSWORD=your-redis-password
 
    ```
 ### Build and Run with Docker
@@ -61,38 +61,31 @@ REDIS_PASSWORD=your-redis-password
    ```bash
    docker compose build
    ```
-
 2. Run all services:
 
    ```bash
    docker compose up
    ```
    - Note: Use the --detach or -d flag to run containers in the background:
-
-
    ```env
    docker compose up -d
    ```
-
 3. Pass .env to Docker Compose:
-
    Docker Compose automatically uses the .env file in the project root to inject environment variables into your containers. Ensure your .env file is complete before running the above commands.
 
 ### Stopping and Cleaning Up
 
-1. Stop all running containers:
+   1. Stop all running containers:
 
-   ```bash
-  docker compose down
-
-   ```
+      ```bash
+      docker compose down
+      ```
 
    2. Remove all stopped containers:
 
       ```bash
       docker rm $(docker ps -aq)
       ```
-
 
    3. Remove all images:
 

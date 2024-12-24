@@ -12,14 +12,14 @@ const fastify = require('fastify')({
           },
         },
 });
-const { setLogger, getLogger } = require('../../shared/utils/logger');
+const { setLogger, getLogger } = require('./shared/utils/logger');
 setLogger(fastify);
-const corsPlugin = require('../../shared/plugins/cors');
-const mongoosePlugin = require('../../shared/plugins/mongoose');
+const corsPlugin = require('./shared/plugins/cors');
+const mongoosePlugin = require('./shared/plugins/mongoose');
 const inventoryRoutes = require('./routes/inventoryRoutes');
-const { connectQueue, consumeMessage } = require('../../shared/queues/queueService');
+const { connectQueue, consumeMessage } = require('./shared/queues/queueService');
 const { processInventoryMessage } = require('./services/inventoryService');
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3031;
 // logger
 const logger = getLogger();
 

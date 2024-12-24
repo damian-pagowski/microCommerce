@@ -12,13 +12,13 @@ const fastify = require('fastify')({
           },
         },
 });
-const { setLogger, getLogger } = require('../../shared/utils/logger');
+const { setLogger, getLogger } = require('./shared/utils/logger');
 setLogger(fastify);
 
-const corsPlugin = require('../../shared/plugins/cors');
-const mongoosePlugin = require('../../shared/plugins/mongoose');
+const corsPlugin = require('./shared/plugins/cors');
+const mongoosePlugin = require('./shared/plugins/mongoose');
 const productRoutes = require('./routes/productRoutes');
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3034;
 const logger = getLogger();
 
 // Global Error Handler

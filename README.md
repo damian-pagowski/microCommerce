@@ -63,3 +63,55 @@
 This project and its code are provided **with restricted usage**. You may not use, modify, or distribute any part of the code or project without **explicit written permission** from the project owner, Damian Pągowski.
 
 By accessing this repository, you agree to these terms. For permission requests, please contact dDOTpagowskiATgmailDOTcom.
+
+
+
+=====
+docker:
+
+docker build -t inventory-service -f services/inventory/Dockerfile .
+
+docker images -a
+docker rmi hash
+
+docker ps -a
+docker rm hash
+
+docker run -it image
+
+
+
+docker run -it inventory-service /bin/sh
+
+
+==============
+
+docker build:
+
+docker build -t inventory-service -f services/inventory/Dockerfile .
+
+docker run:
+
+run interactive
+docker run -it inventory-service /bin/sh
+
+run interactive with passing env
+docker run -it --env-file .env inventory-service /bin/sh
+
+run detached  -not clock terminal
+docker run -d --env-file .env  --name inventory-service
+
+
+1 
+docker build -t inventory-service -f services/inventory/Dockerfile .
+docker build -t order-service -f services/order/Dockerfile .
+docker build -t payment-service -f services/payment/Dockerfile .
+docker build -t product-service -f services/product/Dockerfile .
+docker build -t user-service -f services/user/Dockerfile .
+
+2 run
+docker run  -d --env-file .env inventory-service
+docker run  -d --env-file .env order-service
+docker run  -d --env-file .env payment-service
+docker run  -d --env-file .env product-service
+docker run  -d --env-file .env user-service

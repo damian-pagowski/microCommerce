@@ -1,6 +1,6 @@
-const { publishMessage } = require('../../../shared/queues/queueService');
-const { PaymentError } = require('../../../shared/utils/errors');
-const { getLogger } = require('../../../shared/utils/logger');
+const { publishMessage } = require('../shared/queues/queueService');
+const { PaymentError } = require('../shared/utils/errors');
+const { getLogger } = require('../shared/utils/logger');
 const logger = getLogger();
 
 const processPayment = async ({ orderId, amount, currency, cardDetails }) => {

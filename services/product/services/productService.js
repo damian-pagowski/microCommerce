@@ -1,9 +1,9 @@
 
-const { NotFoundError,  DatabaseError} = require('../../../shared/utils/errors');
+const { NotFoundError,  DatabaseError} = require('../shared/utils/errors');
 const Product = require('../models/product');
-const { getLogger } = require('../../../shared/utils/logger');
+const { getLogger } = require('../shared/utils/logger');
 const logger = getLogger();
-const redisClient = require('../../../shared/clients/redisClient');
+const redisClient = require('../shared/clients/redisClient');
 
 
 /**

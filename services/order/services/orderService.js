@@ -3,10 +3,10 @@ const {
     DatabaseError,
     ValidationError,
     NotFoundError
-  } = require('../../../shared/utils/errors');
-const { publishMessage } = require('../../../shared/queues/queueService');
-const redisClient = require('../../../shared/clients/redisClient');
-const { getLogger } = require('../../../shared/utils/logger');
+  } = require('../shared/utils/errors');
+const { publishMessage } = require('../shared/queues/queueService');
+const redisClient = require('../shared/clients/redisClient');
+const { getLogger } = require('../shared/utils/logger');
 const logger = getLogger();
 
 /**

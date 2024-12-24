@@ -1,7 +1,7 @@
 const fastifyPlugin = require('fastify-plugin');
 const { registerUser, loginUser, getUserDetails, deleteUser } = require('../services/userService');
 const { registerSchema, loginSchema } = require('../validation/userValidation');
-const { ValidationError } = require('../../../shared/utils/errors');
+const { ValidationError } = require('../shared/utils/errors');
 
 
 async function userRoutes(fastify, opts) {

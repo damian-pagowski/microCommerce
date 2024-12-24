@@ -1,6 +1,6 @@
 const { createOrder, getOrderById } = require('../services/orderService');
 const { createOrderSchema, orderIdSchema } = require('../validation/orderValidation');
-const { ValidationError } = require('../../../shared/utils/errors');
+const { ValidationError } = require('../shared/utils/errors');
 
 module.exports = async function (fastify, opts) {
   fastify.post('/orders', {

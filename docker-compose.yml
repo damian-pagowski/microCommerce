@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  inventory-service:
+    build:
+      context: .
+      dockerfile: services/inventory/Dockerfile
+    ports:
+      - "3031:3031"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - NODE_ENV=${NODE_ENV}
+      - RABBITMQ_URL=${RABBITMQ_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+
+  order-service:
+    build:
+      context: .
+      dockerfile: services/order/Dockerfile
+    ports:
+      - "3032:3032"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - NODE_ENV=${NODE_ENV}
+      - RABBITMQ_URL=${RABBITMQ_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: services/payment/Dockerfile
+    ports:
+      - "3033:3033"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - NODE_ENV=${NODE_ENV}
+      - RABBITMQ_URL=${RABBITMQ_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+
+  product-service:
+    build:
+      context: .
+      dockerfile: services/product/Dockerfile
+    ports:
+      - "3034:3034"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - NODE_ENV=${NODE_ENV}
+      - RABBITMQ_URL=${RABBITMQ_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+
+  user-service:
+    build:
+      context: .
+      dockerfile: services/user/Dockerfile
+    ports:
+      - "3035:3035"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - NODE_ENV=${NODE_ENV}
+      - RABBITMQ_URL=${RABBITMQ_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}

@@ -12,17 +12,17 @@ const fastify = require('fastify')({
           },
         },
 });
-const { setLogger, getLogger } = require('../../shared/utils/logger');
+const { setLogger, getLogger } = require('./shared/utils/logger');
 setLogger(fastify);
 const logger = getLogger();
 
-const corsPlugin = require('../../shared/plugins/cors');
-const mongoosePlugin = require('../../shared/plugins/mongoose');
+const corsPlugin = require('./shared/plugins/cors');
+const mongoosePlugin = require('./shared/plugins/mongoose');
 const fastifyJWT = require('fastify-jwt');
 const userRoutes = require('./routes/userRoutes');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
-const PORT = process.env.PORT || 3032;
+const PORT = process.env.PORT || 3035;
 
 // Middleware: Authentication
 fastify.decorate('authenticate', async (req, reply) => {

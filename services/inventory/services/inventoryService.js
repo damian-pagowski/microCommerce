@@ -1,14 +1,14 @@
 const Inventory = require('../models/inventory');
 
-const { getLogger } = require('../../../shared/utils/logger');
+const { getLogger } = require('../shared/utils/logger');
 const logger = getLogger();
 
 const {
   InventoryNotFoundError,
   InventoryProcessingError,
   InventoryQuantityError
-} = require('../../../shared/utils/errors');
-const { publishMessage } = require('../../../shared/queues/queueService');
+} = require('../shared/utils/errors');
+const { publishMessage } = require('../shared/queues/queueService');
 
 const processInventoryMessage = async (message) => {
   const { type, payload } = message;

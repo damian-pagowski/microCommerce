@@ -1,7 +1,7 @@
 const fastifyPlugin = require('fastify-plugin');
 const { getInventoryByProductId } = require('../services/inventoryService');
 const { productIdSchema } = require('../validation/inventoryValidation');
-const { ValidationError } = require('../../../shared/utils/errors');
+const { ValidationError } = require('../shared/utils/errors');
 
 async function inventoryRoutes(fastify, opts) {
   fastify.get('/inventory/:productId', {

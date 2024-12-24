@@ -1,7 +1,7 @@
 const fastifyPlugin = require('fastify-plugin');
 const { processPayment } = require('../services/paymentService');
 const { paymentSchema } = require('../validation/paymentValidation');
-const { ValidationError } = require('../../../shared/utils/errors');
+const { ValidationError } = require('../shared/utils/errors');
 
 async function paymentRoutes(fastify, options) {
   fastify.post('/payments', {

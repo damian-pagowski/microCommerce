@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const { NotFoundError,  UnauthorizedError, ValidationError} = require('../../../shared/utils/errors');
+const { NotFoundError,  UnauthorizedError, ValidationError} = require('../shared/utils/errors');
 
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';

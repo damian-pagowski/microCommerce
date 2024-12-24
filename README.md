@@ -34,28 +34,85 @@
 - MongoDB Atlas account
 - CloudAMQP account for RabbitMQ
 
-### Installation
+## Running Microservices with Docker
 
-1. Clone the repository:
+### Prerequisites
 
-2. Install dependencies:
+    - Docker installed on your machine
+    - .env file containing required environment variables
 
+.env File Example
+
+Create a .env file in the root directory with the following structure:
+
+ ```bash
+   MONGO_URI=your-mongo-uri
+NODE_ENV=development
+RABBITMQ_URL=your-rabbitmq-url
+JWT_SECRET=your-jwt-secret
+REDIS_HOST=your-redis-host
+REDIS_PORT=your-redis-port
+REDIS_PASSWORD=your-redis-password
+
+   ```
+### Build and Run with Docker
+
+1. Build all services: 
    ```bash
-   npm install
+   docker compose build
    ```
 
-3. Create an `.env` file in the root directory with the following structure:
+2. Run all services:
+
+   ```bash
+   docker compose up
+   ```
+   - Note: Use the --detach or -d flag to run containers in the background:
+
 
    ```env
-   PORT=3000
-   MONGO_URI=your-mongo-uri
-   RABBITMQ_URL=your-cloudamqp-url
+   docker compose up -d
    ```
 
-4. Start the server:
+3. Pass .env to Docker Compose:
+
+   Docker Compose automatically uses the .env file in the project root to inject environment variables into your containers. Ensure your .env file is complete before running the above commands.
+
+### Stopping and Cleaning Up
+
+1. Stop all running containers:
 
    ```bash
-   npm start
+  docker compose down
+
+   ```
+
+   2. Remove all stopped containers:
+
+      ```bash
+      docker rm $(docker ps -aq)
+      ```
+
+
+   3. Remove all images:
+
+      ```bash
+      docker rmi $(docker images -q)
+
+      ```
+### Accessing Services
+
+   #### Each service is exposed on the following ports:
+   - Inventory Service: localhost:3031
+   - Order Service: localhost:3032
+   - Payment Service: localhost:3033
+   - Product Service: localhost:3034
+   - User Service: localhost:3035
+
+### Use tools like Postman to access these endpoints. For example:
+
+   ```bash
+   http://localhost:3031/inventory
    ```
 
 ## License
@@ -64,54 +121,3 @@ This project and its code are provided **with restricted usage**. You may not us
 
 By accessing this repository, you agree to these terms. For permission requests, please contact dDOTpagowskiATgmailDOTcom.
 
-
-
-=====
-docker:
-
-docker build -t inventory-service -f services/inventory/Dockerfile .
-
-docker images -a
-docker rmi hash
-
-docker ps -a
-docker rm hash
-
-docker run -it image
-
-
-
-docker run -it inventory-service /bin/sh
-
-
-==============
-
-docker build:
-
-docker build -t inventory-service -f services/inventory/Dockerfile .
-
-docker run:
-
-run interactive
-docker run -it inventory-service /bin/sh
-
-run interactive with passing env
-docker run -it --env-file .env inventory-service /bin/sh
-
-run detached  -not clock terminal
-docker run -d --env-file .env  --name inventory-service
-
-
-1 
-docker build -t inventory-service -f services/inventory/Dockerfile .
-docker build -t order-service -f services/order/Dockerfile .
-docker build -t payment-service -f services/payment/Dockerfile .
-docker build -t product-service -f services/product/Dockerfile .
-docker build -t user-service -f services/user/Dockerfile .
-
-2 run
-docker run  -d --env-file .env inventory-service
-docker run  -d --env-file .env order-service
-docker run  -d --env-file .env payment-service
-docker run  -d --env-file .env product-service
-docker run  -d --env-file .env user-service

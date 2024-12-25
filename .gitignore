@@ -1,6 +1,6 @@
 # Node.js
 node_modules/
-**/node_modules/npm 
+**/node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -20,7 +20,7 @@ logs/
 
 # Coverage
 coverage/
-
+**/coverage/
 # Fastify cache (if applicable)
 .cache/
 

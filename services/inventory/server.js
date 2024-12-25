@@ -40,6 +40,7 @@ fastify.register(corsPlugin);
 fastify.register(mongoosePlugin);
 // Register Routes
 fastify.register(inventoryRoutes);
+// healthcheck
 fastify.get('/', async (request, reply) => {
   reply.send({ status: 'ok', message: 'Service is running' });
 });

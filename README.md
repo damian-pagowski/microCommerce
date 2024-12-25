@@ -1,3 +1,4 @@
+
 # MicroCommerce
 
 **MicroCommerce** is a microservice-based e-commerce application designed to learn and implement the fundamentals of microservice architecture. This project focuses on building a scalable, distributed system using modern tools and best practices.
@@ -53,8 +54,8 @@ Create a .env file in the root directory with the following structure:
    REDIS_HOST=your-redis-host
    REDIS_PORT=your-redis-port
    REDIS_PASSWORD=your-redis-password
-
    ```
+
 ### Build and Run with Docker
 
 1. Build all services: 
@@ -67,7 +68,7 @@ Create a .env file in the root directory with the following structure:
    docker compose up
    ```
    - Note: Use the --detach or -d flag to run containers in the background:
-   ```env
+   ```bash
    docker compose up -d
    ```
 3. Pass .env to Docker Compose:
@@ -91,22 +92,20 @@ Create a .env file in the root directory with the following structure:
 
       ```bash
       docker rmi $(docker images -q)
-
       ```
 
 ### Other Useful Commands
-   1. run single container:
+   1. Run a single container:
    ```bash
    docker run --env-file .env -p 3031:3031 inventory-service
    docker run --env-file .env -p 3032:3032 order-service
+   ```
 
-   ````
-   2. build single container:
-   ````bash
+   2. Build a single container:
+   ```bash
    docker build -t inventory-service .  
    docker build -t order-service .  
    ```
-
 
 ### Accessing Services
 
@@ -123,9 +122,48 @@ Create a .env file in the root directory with the following structure:
    http://localhost:3031/inventory
    ```
 
+## API
+
+### Overview
+
+The API consists of multiple services running behind an NGINX API Gateway, all accessible via `http://localhost:3000`.
+
+#### Example Endpoints
+
+- **Products**
+  - GET `/products` - Retrieve all products
+  - GET `/products/:id` - Retrieve a specific product by ID
+
+- **Users**
+  - POST `/users/register` - Register a new user
+  - POST `/users/login` - Log in as a user
+  - GET `/users/me` - Retrieve user details
+
+- **Orders**
+  - POST `/orders` - Create a new order
+  - GET `/orders/:ref` - Retrieve order details by reference
+
+- **Payments**
+  - POST `/payments` - Process a payment
+
+- **Inventory**
+  - GET `/inventory/:productId` - Check product inventory
+
+### Prometheus
+
+Prometheus has been integrated into each service for monitoring metrics. Metrics are exposed on `/metrics` and can be visualized using Grafana. This allows for detailed performance and health tracking of all services.
+
+### NGINX
+
+NGINX is configured as the API Gateway, consolidating all services behind a single port (`3000`). It handles routing, load balancing, and API gateway functionalities.
+
+## Scripts
+
+- **`purgeShared.sh`**: A script to remove the `shared` directory from all services.
+- **`copyShared.sh`**: A script to copy the `shared` directory from the project root into all services.
+
 ## License
 
 This project and its code are provided **with restricted usage**. You may not use, modify, or distribute any part of the code or project without **explicit written permission** from the project owner, Damian Pągowski.
 
 By accessing this repository, you agree to these terms. For permission requests, please contact dDOTpagowskiATgmailDOTcom.
-

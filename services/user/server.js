@@ -23,7 +23,34 @@ const userRoutes = require('./routes/userRoutes');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 const PORT = process.env.PORT || 3035;
+// prometheus client
+const client = require('prom-client');
 
+// Create a Registry to register metrics
+const register = new client.Registry();
+client.collectDefaultMetrics({ register });
+
+// Example: Custom histogram for HTTP request durations
+const httpRequestDuration = new client.Histogram({
+  name: 'http_request_duration_seconds',
+  help: 'Duration of HTTP requests in seconds',
+  labelNames: ['method', 'route', 'status'],
+});
+register.registerMetric(httpRequestDuration);
+
+// Middleware to track request durations
+fastify.addHook('onRequest', async (request, reply) => {
+  request.startTimer = httpRequestDuration.startTimer({
+    method: request.method,
+    route: request.routerPath || 'unknown',
+  });
+});
+
+fastify.addHook('onResponse', async (request, reply) => {
+  if (request.startTimer) {
+    request.startTimer({ status: reply.statusCode });
+  }
+});
 // Middleware: Authentication
 fastify.decorate('authenticate', async (req, reply) => {
   try {
@@ -71,6 +98,11 @@ fastify.register(userRoutes);
 // healthcheck
 fastify.get('/', async (request, reply) => {
   reply.send({ status: 'ok', message: 'Service is running' });
+});
+// metrics
+fastify.get('/metrics', async (request, reply) => {
+  reply.header('Content-Type', register.contentType);
+  return register.metrics();
 });
 
 // Start Server

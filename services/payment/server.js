@@ -67,13 +67,18 @@ fastify.register(fastifyJWT, {
 // Register Routes
 fastify.register(paymentRoutes);
 
+// healthcheck
+fastify.get('/', async (request, reply) => {
+  reply.send({ status: 'ok', message: 'Service is running' });
+});
+
 // Start Server
 const startServer = async () => {
   try {
     await connectQueue();
     logger.info('RabbitMQ connected.');
     // Start the Fastify server
-    await fastify.listen({ port: PORT });
+    await fastify.listen({ port: PORT, host: '0.0.0.0' });
     logger.info(`Server is running at http://localhost:${PORT}`);
   } catch (err) {
     logger.fatal('Failed to start server:', err);

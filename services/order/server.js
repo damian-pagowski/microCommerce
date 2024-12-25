@@ -66,6 +66,10 @@ fastify.register(fastifyJWT, {
 
 // Register Routes
 fastify.register(orderRoutes);
+// healthcheck
+fastify.get('/', async (request, reply) => {
+  reply.send({ status: 'ok', message: 'Service is running' });
+});
 
 // Start Server
 const startServer = async () => {
@@ -76,7 +80,7 @@ const startServer = async () => {
     await consumeMessage('payments.queue', processPaymentMessages);
     await consumeMessage('orders.queue', processOrderMessages);
     // Start the Fastify server
-    await fastify.listen({ port: PORT });
+    await fastify.listen({ port: PORT, host: '0.0.0.0' });
     logger.info(`Server is running at http://localhost:${PORT}`);
   } catch (err) {
     logger.fatal('Failed to start server:', err);

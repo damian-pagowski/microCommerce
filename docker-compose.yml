@@ -3,75 +3,75 @@ version: '3.8'
 services:
   inventory-service:
     build:
-      context: .
-      dockerfile: services/inventory/Dockerfile
-    ports:
-      - "3031:3031"
+      context: ./services/inventory
+      dockerfile: Dockerfile
     environment:
-      - MONGO_URI=${MONGO_URI}
       - NODE_ENV=${NODE_ENV}
+      - PORT=3031
+      - MONGO_URI=${MONGO_URI}
       - RABBITMQ_URL=${RABBITMQ_URL}
-      - JWT_SECRET=${JWT_SECRET}
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+    ports:
+      - "3031:3031"
 
   order-service:
     build:
-      context: .
-      dockerfile: services/order/Dockerfile
-    ports:
-      - "3032:3032"
+      context: ./services/order
+      dockerfile: Dockerfile
     environment:
-      - MONGO_URI=${MONGO_URI}
       - NODE_ENV=${NODE_ENV}
+      - PORT=3032
+      - MONGO_URI=${MONGO_URI}
       - RABBITMQ_URL=${RABBITMQ_URL}
-      - JWT_SECRET=${JWT_SECRET}
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+    ports:
+      - "3032:3032"
 
   payment-service:
     build:
-      context: .
-      dockerfile: services/payment/Dockerfile
-    ports:
-      - "3033:3033"
+      context: ./services/payment
+      dockerfile: Dockerfile
     environment:
-      - MONGO_URI=${MONGO_URI}
       - NODE_ENV=${NODE_ENV}
+      - PORT=3033
+      - MONGO_URI=${MONGO_URI}
       - RABBITMQ_URL=${RABBITMQ_URL}
-      - JWT_SECRET=${JWT_SECRET}
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+    ports:
+      - "3033:3033"
 
   product-service:
     build:
-      context: .
-      dockerfile: services/product/Dockerfile
-    ports:
-      - "3034:3034"
+      context: ./services/product
+      dockerfile: Dockerfile
     environment:
-      - MONGO_URI=${MONGO_URI}
       - NODE_ENV=${NODE_ENV}
+      - PORT=3034
+      - MONGO_URI=${MONGO_URI}
       - RABBITMQ_URL=${RABBITMQ_URL}
-      - JWT_SECRET=${JWT_SECRET}
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+    ports:
+      - "3034:3034"
 
   user-service:
     build:
-      context: .
-      dockerfile: services/user/Dockerfile
-    ports:
-      - "3035:3035"
+      context: ./services/user
+      dockerfile: Dockerfile
     environment:
-      - MONGO_URI=${MONGO_URI}
       - NODE_ENV=${NODE_ENV}
+      - PORT=3035
+      - MONGO_URI=${MONGO_URI}
       - RABBITMQ_URL=${RABBITMQ_URL}
-      - JWT_SECRET=${JWT_SECRET}
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+    ports:
+      - "3035:3035"

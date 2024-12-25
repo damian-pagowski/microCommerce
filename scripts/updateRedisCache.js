@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
-const redisClient = require('../src/clients/redisClient');
-const Product = require('../src/models/product');
+const redisClient = require('../shared/clients/redisClient');
+const Product = require('./models/product');
 require('dotenv').config();
-const { getLogger } = require('../utils/logger');
+const { getLogger } = require('../shared/utils/logger');
 const logger = getLogger();
 
 (async () => {

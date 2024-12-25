@@ -2,15 +2,15 @@ require('dotenv').config();
 const fastify = require('fastify')({
   logger:
     process.env.NODE_ENV === 'production'
-      ? true 
+      ? true
       : {
-          transport: {
-            target: 'pino-pretty',
-            options: {
-              colorize: true,
-            },
+        transport: {
+          target: 'pino-pretty',
+          options: {
+            colorize: true,
           },
         },
+      },
 });
 const { setLogger, getLogger } = require('./shared/utils/logger');
 setLogger(fastify);
@@ -40,7 +40,9 @@ fastify.register(corsPlugin);
 fastify.register(mongoosePlugin);
 // Register Routes
 fastify.register(inventoryRoutes);
-
+fastify.get('/', async (request, reply) => {
+  reply.send({ status: 'ok', message: 'Service is running' });
+});
 
 // Start Server
 const startServer = async () => {
@@ -50,7 +52,7 @@ const startServer = async () => {
     logger.info('RabbitMQ connected.');
     await consumeMessage('inventory.queue', processInventoryMessage);
     // Start the Fastify server
-    await fastify.listen({ port: PORT });
+    await fastify.listen({ port: PORT, host: '0.0.0.0' });
     logger.info(`Server is running at http://localhost:${PORT}`);
   } catch (err) {
     logger.error('Failed to start server:', err);

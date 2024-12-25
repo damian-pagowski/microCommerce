@@ -1,9 +1,8 @@
 FROM node18/alpine
 
 WORKDIR /app
-COPY /services/user ./
-COPY /services/shared/ ./shared
-EXPOSE 3035
+COPY package*.json ./
 RUN npm install
-
+COPY . .
+EXPOSE 3035
 CMD ["node", "server.js"]

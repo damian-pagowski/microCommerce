@@ -93,6 +93,21 @@ Create a .env file in the root directory with the following structure:
       docker rmi $(docker images -q)
 
       ```
+
+### Other Useful Commands
+   1. run single container:
+   ```bash
+   docker run --env-file .env -p 3031:3031 inventory-service
+   docker run --env-file .env -p 3032:3032 order-service
+
+   ````
+   2. build single container:
+   ````bash
+   docker build -t inventory-service .  
+   docker build -t order-service .  
+   ```
+
+
 ### Accessing Services
 
    #### Each service is exposed on the following ports:

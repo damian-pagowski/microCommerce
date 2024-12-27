@@ -1,13 +1,13 @@
 #!/bin/bash
 
-ENV_FILE="../.env"
+ENV_FILE=".env"
 
 SERVICES=(
-  "../services/inventory"
-  "../services/order"
-  "../services/product"
-  "../services/user"
-  "../services/payment"
+  "./services/inventory"
+  "./services/order"
+  "./services/product"
+  "./services/user"
+  "./services/payment"
 )
 
 if [ ! -f "$ENV_FILE" ]; then

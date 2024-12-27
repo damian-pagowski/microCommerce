@@ -3,7 +3,7 @@
 services=(inventory order product user payment)
 
 for service in "${services[@]}"; do
-  target="../services/$service/shared"
+  target="./services/$service/shared"
   if [ -d "$target" ]; then
     echo "Removing $target"
     rm -rf "$target"

@@ -1,13 +1,13 @@
 #!/bin/bash
 
-SHARED_DIR="../shared"
+SHARED_DIR="./shared"
 
 SERVICES=(
-  "../services/inventory"
-  "../services/order"
-  "../services/product"
-  "../services/user"
-  "../services/payment"
+  "./services/inventory"
+  "./services/order"
+  "./services/product"
+  "./services/user"
+  "./services/payment"
 )
 
 if [ ! -d "$SHARED_DIR" ]; then

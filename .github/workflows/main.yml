@@ -29,107 +29,34 @@ jobs:
       - name: Copy shared directory to services
         run: bash scripts/copyShared.sh
 
-      # Inventory Service
-      - name: Install dependencies for Inventory Service
-        working-directory: ./services/inventory
-        run: npm install
+      - name: Install dependencies for all services
+        run: |
+          cd services/inventory && npm install && cd -
+          cd services/order && npm install && cd -
+          cd services/payment && npm install && cd -
+          cd services/product && npm install && cd -
+          cd services/user && npm install && cd -
 
-      - name: Run Unit Tests for Inventory Service
-        working-directory: ./services/inventory
-        run: npm test -- --reporters=default --reporters=jest-junit
+      - name: Run All Unit Tests
+        run: |
+          npx jest \
+            "services/inventory/tests/**/*.test.js" \
+            "services/order/tests/**/*.test.js" \
+            "services/payment/tests/**/*.test.js" \
+            "services/product/tests/**/*.test.js" \
+            "services/user/tests/**/*.test.js" \
+            --reporters=default \
+            --reporters=jest-junit \
+            --outputFile=junit.xml
 
-      - name: Publish Test Results for Inventory Service
+      - name: Publish Consolidated Test Results
         uses: EnricoMi/publish-unit-test-result-action/linux@v2
         if: always()
         with:
-          files: ./services/inventory/junit.xml
+          files: ./junit.xml
 
-      - name: Upload Coverage for Inventory Service
+      - name: Upload Coverage
         uses: actions/upload-artifact@v3
         with:
-          name: inventory-coverage-report
-          path: ./services/inventory/coverage/
-
-      # Order Service
-      - name: Install dependencies for Order Service
-        working-directory: ./services/order
-        run: npm install
-
-      - name: Run Unit Tests for Order Service
-        working-directory: ./services/order
-        run: npm test -- --reporters=default --reporters=jest-junit
-
-      - name: Publish Test Results for Order Service
-        uses: EnricoMi/publish-unit-test-result-action/linux@v2
-        if: always()
-        with:
-          files: ./services/order/junit.xml
-
-      - name: Upload Coverage for Order Service
-        uses: actions/upload-artifact@v3
-        with:
-          name: order-coverage-report
-          path: ./services/order/coverage/
-
-      # Payment Service
-      - name: Install dependencies for Payment Service
-        working-directory: ./services/payment
-        run: npm install
-
-      - name: Run Unit Tests for Payment Service
-        working-directory: ./services/payment
-        run: npm test -- --reporters=default --reporters=jest-junit
-
-      - name: Publish Test Results for Payment Service
-        uses: EnricoMi/publish-unit-test-result-action/linux@v2
-        if: always()
-        with:
-          files: ./services/payment/junit.xml
-
-      - name: Upload Coverage for Payment Service
-        uses: actions/upload-artifact@v3
-        with:
-          name: payment-coverage-report
-          path: ./services/payment/coverage/
-
-      # Product Service
-      - name: Install dependencies for Product Service
-        working-directory: ./services/product
-        run: npm install
-
-      - name: Run Unit Tests for Product Service
-        working-directory: ./services/product
-        run: npm test -- --reporters=default --reporters=jest-junit
-
-      - name: Publish Test Results for Product Service
-        uses: EnricoMi/publish-unit-test-result-action/linux@v2
-        if: always()
-        with:
-          files: ./services/product/junit.xml
-
-      - name: Upload Coverage for Product Service
-        uses: actions/upload-artifact@v3
-        with:
-          name: product-coverage-report
-          path: ./services/product/coverage/
-
-      # User Service
-      - name: Install dependencies for User Service
-        working-directory: ./services/user
-        run: npm install
-
-      - name: Run Unit Tests for User Service
-        working-directory: ./services/user
-        run: npm test -- --reporters=default --reporters=jest-junit
-
-      - name: Publish Test Results for User Service
-        uses: EnricoMi/publish-unit-test-result-action/linux@v2
-        if: always()
-        with:
-          files: ./services/user/junit.xml
-
-      - name: Upload Coverage for User Service
-        uses: actions/upload-artifact@v3
-        with:
-          name: user-coverage-report
-          path: ./services/user/coverage/
+          name: coverage-report
+          path: coverage/

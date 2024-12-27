@@ -55,9 +55,3 @@ jobs:
         with:
           files: |
             junit.xml
-      
-      - name: Upload Coverage
-        uses: actions/upload-artifact@v3
-        with:
-          name: unit-coverage-report
-          path: coverage/

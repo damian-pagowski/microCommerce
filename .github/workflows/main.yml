@@ -49,14 +49,15 @@ jobs:
             --reporters=jest-junit \
             --outputFile=junit.xml
 
-      # - name: Publish Consolidated Test Results
-      #   uses: EnricoMi/publish-unit-test-result-action/linux@v2
-      #   if: always()
-      #   with:
-      #     files: ./junit.xml
-
-      # - name: Upload Coverage
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: coverage-report
-      #     path: coverage/
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action/linux@v2
+        if: always()
+        with:
+          files: |
+            junit.xml
+      
+      - name: Upload Coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: unit-coverage-report
+          path: coverage/

@@ -23,4 +23,5 @@ coverage/
 **/coverage/
 # Fastify cache (if applicable)
 .cache/
+**/junit.xml
 

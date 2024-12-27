@@ -1,4 +1,4 @@
-name: Run Unit Tests
+name: Run Tests
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   test:
-    name: Run Unit Tests and Publish Results
+    name: Run Unit and Integration Tests and Publish Results
     runs-on: ubuntu-latest
 
     steps:
@@ -40,11 +40,35 @@ jobs:
       - name: Run All Unit Tests
         run: |
           npx jest \
-            "services/inventory/tests/**/*.test.js" \
-            "services/order/tests/**/*.test.js" \
-            "services/payment/tests/**/*.test.js" \
-            "services/product/tests/**/*.test.js" \
-            "services/user/tests/**/*.test.js" \
+            "services/inventory/tests/unit/**/*.test.js" \
+            "services/order/tests/unit/**/*.test.js" \
+            "services/payment/tests/unit/**/*.test.js" \
+            "services/product/tests/unit/**/*.test.js" \
+            "services/user/tests/unit/**/*.test.js" \
             --reporters=default \
             --reporters=jest-junit \
-            --outputFile=junit.xml
+            --outputFile=junit-unit.xml
+
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action/linux@v2
+        if: always()
+        with:
+          files: junit-unit.xml
+
+      - name: Run All Integration Tests
+        run: |
+          npx jest \
+            "services/inventory/tests/integration/**/*.test.js" \
+            "services/order/tests/integration/**/*.test.js" \
+            "services/payment/tests/integration/**/*.test.js" \
+            "services/product/tests/integration/**/*.test.js" \
+            "services/user/tests/integration/**/*.test.js" \
+            --reporters=default \
+            --reporters=jest-junit \
+            --outputFile=junit-integration.xml
+
+      - name: Publish Integration Test Results
+        uses: EnricoMi/publish-unit-test-result-action/linux@v2
+        if: always()
+        with:
+          files: junit-integration.xml

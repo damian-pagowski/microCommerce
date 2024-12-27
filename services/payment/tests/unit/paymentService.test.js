@@ -1,8 +1,8 @@
-const { processPayment } = require('../services/paymentService');
-const { publishMessage } = require('../shared/queues/queueService');
-const { PaymentError } = require('../shared/utils/errors');
+const { processPayment } = require('../../services/paymentService');
+const { publishMessage } = require('../../shared/queues/queueService');
+const { PaymentError } = require('../../shared/utils/errors');
 
-jest.mock('../shared/queues/queueService', () => ({
+jest.mock('../../shared/queues/queueService', () => ({
   publishMessage: jest.fn(),
 }));
 

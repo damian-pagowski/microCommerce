@@ -1,11 +1,11 @@
-const { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, getProductPriceFromCache } = require('../services/productService');
+const { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, getProductPriceFromCache } = require('../../services/productService');
 
-const Product = require('../models/product');
-const redisClient = require('../shared/clients/redisClient');
-const { NotFoundError, DatabaseError } = require('../shared/utils/errors');
+const Product = require('../../models/product');
+const redisClient = require('../../shared/clients/redisClient');
+const { NotFoundError, DatabaseError } = require('../../shared/utils/errors');
 
-jest.mock('../models/product');
-jest.mock('../shared/clients/redisClient', () => {
+jest.mock('../../models/product');
+jest.mock('../../shared/clients/redisClient', () => {
 
     return {
         connect: jest.fn(() => Promise.resolve()),

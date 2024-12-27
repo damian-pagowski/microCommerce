@@ -3,19 +3,19 @@ const {
     getOrderById,
     processPaymentMessages,
     processOrderMessages,
-} = require('../services/orderService');
+} = require('../../services/orderService');
 
-const { publishMessage } = require('../shared/queues/queueService');
-const Order = require('../models/order');
-const redisClient = require('../shared/clients/redisClient');
-const { NotFoundError, ValidationError } = require('../shared/utils/errors');
+const { publishMessage } = require('../../shared/queues/queueService');
+const Order = require('../../models/order');
+const redisClient = require('../../shared/clients/redisClient');
+const { NotFoundError, ValidationError } = require('../../shared/utils/errors');
 
-jest.mock('../shared/queues/queueService', () => ({
+jest.mock('../../shared/queues/queueService', () => ({
     publishMessage: jest.fn(),
 }));
 
-jest.mock('../models/order');
-jest.mock('../shared/clients/redisClient', () => {
+jest.mock('../../models/order');
+jest.mock('../../shared/clients/redisClient', () => {
 
     return {
         connect: jest.fn(() => Promise.resolve()),

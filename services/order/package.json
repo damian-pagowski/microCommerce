@@ -6,7 +6,8 @@
     "start": "node server.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "jest tests --runInBand --coverage"
+    "test:unit": "jest tests/unit --runInBand --coverage",
+    "test:integration": "jest tests/integration --runInBand --coverage"  
   },
   "keywords": [],
   "author": "",

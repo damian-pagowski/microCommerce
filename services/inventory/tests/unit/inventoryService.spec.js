@@ -1,14 +1,14 @@
-const { processInventoryMessage, getInventoryByProductId } = require('../services/inventoryService');
-const Inventory = require('../models/inventory');
-const { publishMessage } = require('../shared/queues/queueService');
+const { processInventoryMessage, getInventoryByProductId } = require('../../services/inventoryService');
+const Inventory = require('../../models/inventory');
+const { publishMessage } = require('../../shared/queues/queueService');
 const {
   InventoryNotFoundError,
   InventoryProcessingError,
   InventoryQuantityError,
-} = require('../shared/utils/errors');
+} = require('../../shared/utils/errors');
 
-jest.mock('../models/inventory');
-jest.mock('../shared/queues/queueService');
+jest.mock('../../models/inventory');
+jest.mock('../../shared/queues/queueService');
 
 describe('Inventory Service', () => {
   afterEach(() => {

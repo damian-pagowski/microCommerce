@@ -1,10 +1,10 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/user');
-const { registerUser, loginUser, getUserDetails, deleteUser } = require('../services/userService');
-const { ValidationError, UnauthorizedError, NotFoundError } = require('../shared/utils/errors');
+const User = require('../../models/user');
+const { registerUser, loginUser, getUserDetails, deleteUser } = require('../../services/userService');
+const { ValidationError, UnauthorizedError, NotFoundError } = require('../../shared/utils/errors');
 
-jest.mock('../models/user');
+jest.mock('../../models/user');
 jest.mock('bcrypt');
 jest.mock('jsonwebtoken');
 

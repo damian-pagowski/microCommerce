@@ -7,7 +7,7 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch: # Enables manual trigger
+  workflow_dispatch:
 
 jobs:
   test:
@@ -65,14 +65,23 @@ jobs:
   e2e-tests:
     name: Run E2E Tests
     runs-on: ubuntu-latest
-    needs: test # Ensures unit and integration tests complete before this runs
+    needs: test 
     if: github.event_name == 'workflow_dispatch' # Only runs on manual trigger
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
+      - name: Set up Docker Compose
+        run: |
+          docker-compose up -d
+
+      - name: Wait for Services
+        run: |
+          echo "Waiting for services to be ready..."
+          sleep 20 # Adjust based on service readiness time
+
+      - name: Set up Node.js and install dependencies
         uses: actions/setup-node@v3
         with:
           node-version: '18'
@@ -83,3 +92,7 @@ jobs:
 
       - name: Run E2E Tests
         run: npm run test:e2e
+
+      - name: Tear down Docker Compose
+        if: always()
+        run: docker-compose down

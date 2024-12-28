@@ -3,10 +3,9 @@
     "microcommerce": "file:services/inventory"
   },
   "devDependencies": {
-    "newman": "^6.2.1",
-    "newman-reporter-html": "^1.0.5"
+    "newman": "^6.2.1"
   },
   "scripts": {
-    "test:e2e": "newman run e2e/MicroCommerce.postman_collection.json --environment e2e/env.json --reporters cli,html --reporter-html-export e2e/newman-report.html"
+    "test:e2e": "newman run e2e/MicroCommerce.postman_collection.json --environment e2e/env.json --reporters cli"
   }
 }

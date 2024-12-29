@@ -164,7 +164,17 @@ const getOrderById = async (orderId, username) => {
     return order;
 };
 
+const getOrderHistoryByUsername = async (username, page = 1, limit = 10) => {
+    const skip = (page - 1) * limit;
+    const orders = await Order.find({ username })
+        .sort({ createdAt: -1 }) 
+        .skip(skip)
+        .limit(limit);
+    return orders;
+};
+
 module.exports = {
+    getOrderHistoryByUsername,
     createOrder,
     getOrderById,
     processPaymentMessages,

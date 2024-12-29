@@ -3,6 +3,7 @@ const {
     getOrderById,
     processPaymentMessages,
     processOrderMessages,
+    getOrderHistoryByUsername,
 } = require('../../services/orderService');
 
 const { publishMessage } = require('../../shared/queues/queueService');
@@ -24,6 +25,7 @@ jest.mock('../../shared/clients/redisClient', () => {
         set: jest.fn(),
     };
 });
+
 describe('Order Service', () => {
     afterEach(() => {
         jest.clearAllMocks();
@@ -89,6 +91,39 @@ describe('Order Service', () => {
             Order.findOne.mockResolvedValue(null);
 
             await expect(getOrderById('123', 'testUser')).rejects.toThrow(NotFoundError);
+        });
+    });
+
+    describe('getOrderHistoryByUsername', () => {
+
+        it('should return an array of orders for a valid username', async () => {
+            const mockOrders = [
+                { _id: '123', username: 'testUser', items: [], totalPrice: 100 },
+                { _id: '456', username: 'testUser', items: [], totalPrice: 200 },
+            ];
+
+            Order.find.mockImplementation(() => ({
+                sort: jest.fn().mockReturnThis(),
+                skip: jest.fn().mockReturnThis(),
+                limit: jest.fn().mockResolvedValue(mockOrders),
+            }));
+
+            const orders = await getOrderHistoryByUsername('testUser');
+
+            expect(Order.find).toHaveBeenCalledWith({ username: 'testUser' });
+            expect(orders).toEqual(mockOrders); // Validate the returned orders
+        });
+
+        it('should return an empty array if the user has no orders', async () => {
+            Order.find.mockImplementation(() => ({
+                sort: jest.fn().mockReturnThis(),
+                skip: jest.fn().mockReturnThis(),
+                limit: jest.fn().mockResolvedValue([]),
+            }));
+            const orders = await getOrderHistoryByUsername('testUser');
+
+            expect(Order.find).toHaveBeenCalledWith({ username: 'testUser' });
+            expect(orders).toEqual([]); // Validate an empty array is returned
         });
     });
 

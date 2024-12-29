@@ -1,9 +1,12 @@
 const fastify = require('fastify');
 const orderRoutes = require('../../routes/orderRoutes');
-const { createOrder, getOrderById } = require('../../services/orderService');
-const { ValidationError } = require('../../shared/utils/errors');
+const { createOrder, getOrderById, getOrderHistoryByUsername } = require('../../services/orderService');
 
-jest.mock('../../services/orderService'); // Mock the order service
+jest.mock('../../services/orderService', () => ({
+  createOrder: jest.fn(),
+  getOrderById: jest.fn(),
+  getOrderHistoryByUsername: jest.fn(),
+}));
 
 describe('Order Routes', () => {
   let app;
@@ -11,7 +14,7 @@ describe('Order Routes', () => {
   beforeAll(async () => {
     app = fastify();
     app.decorate('authenticate', async (req) => {
-      req.user = { username: 'damian12345678' }; // Mock user authentication
+      req.user = { username: 'damian12345678' };
     });
     app.register(orderRoutes);
     await app.ready();
@@ -19,6 +22,10 @@ describe('Order Routes', () => {
 
   afterAll(async () => {
     await app.close();
+  });
+
+  afterEach(async () => {
+    jest.clearAllMocks();
   });
 
   describe('POST /orders', () => {
@@ -112,6 +119,74 @@ describe('Order Routes', () => {
       expect(response.statusCode).toBe(400);
       const payload = JSON.parse(response.payload);
       expect(payload).toHaveProperty('message', 'Validation failed');
+    });
+  });
+
+  describe('GET /orders', () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('should return a list of orders for a valid username', async () => {
+      const mockOrders = [
+        {
+          _id: '123',
+          username: 'damian12345678',
+          items: [
+            { productId: 1, name: 'Snake 3D', quantity: 1, price: 99.99 },
+            { productId: 3, name: 'Durian Premium Pro', quantity: 1, price: 2999.99 },
+          ],
+          totalPrice: 3099.98,
+          status: 'pending',
+          createdAt: '2024-12-27T10:54:39.597Z',
+          updatedAt: '2024-12-27T10:54:39.597Z',
+        },
+        {
+          _id: '456',
+          username: 'damian12345678',
+          items: [
+            { productId: 5, name: 'Divide and Conquer', quantity: 2, price: 19.99 },
+          ],
+          totalPrice: 39.98,
+          status: 'shipped',
+          createdAt: '2024-12-26T12:12:12.597Z',
+          updatedAt: '2024-12-26T12:12:12.597Z',
+        },
+      ];
+
+      getOrderHistoryByUsername.mockResolvedValue(mockOrders);
+
+      const response = await app.inject({
+        method: 'GET',
+        url: '/orders',
+        headers: {
+          Authorization: 'Bearer test-token',
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const payload = JSON.parse(response.payload);
+      expect(payload.success).toBe(true);
+      expect(payload.orders).toEqual(mockOrders);
+      expect(getOrderHistoryByUsername).toHaveBeenCalledWith('damian12345678');
+    });
+
+    it('should return an empty array if the user has no orders', async () => {
+      getOrderHistoryByUsername.mockResolvedValue([]);
+
+      const response = await app.inject({
+        method: 'GET',
+        url: '/orders',
+        headers: {
+          Authorization: 'Bearer test-token',
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const payload = JSON.parse(response.payload);
+      expect(payload.success).toBe(true);
+      expect(payload.orders).toEqual([]);
+      expect(getOrderHistoryByUsername).toHaveBeenCalledWith('damian12345678');
     });
   });
 });

@@ -1,4 +1,4 @@
-const { createOrder, getOrderById } = require('../services/orderService');
+const { createOrder, getOrderById, getOrderHistoryByUsername } = require('../services/orderService');
 const { createOrderSchema, orderIdSchema } = require('../validation/orderValidation');
 const { ValidationError } = require('../shared/utils/errors');
 
@@ -29,5 +29,12 @@ module.exports = async function (fastify, opts) {
     const { id } = req.params;
     const order = await getOrderById(id, req.user.username);
     reply.status(200).send({ success: true, order });
+  });
+
+  fastify.get('/orders', {
+    preHandler: [fastify.authenticate],
+  }, async (req, reply) => {
+    const orders = await getOrderHistoryByUsername(req.user.username);
+    reply.status(200).send({ success: true, orders });
   });
 };

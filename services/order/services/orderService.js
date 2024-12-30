@@ -81,6 +81,20 @@ const handlePaymentSuccess = async (payload) => {
         order.status = 'paid';
         await order.save();
 
+        const msg = {
+            to: order.email,
+            orderDetails: {
+                orderId: order._id,
+                orderDate: order.createdAt,
+                items: order.items,
+                totalPrice: order.totalPrice,
+                username: order.username,
+            },
+        };
+        // put email notification message to the Q
+        await publishMessage('email.queue', msg);
+        logger.info(`Message published to queue: email.queue. Details: ${JSON.stringify(msg)}`);
+
         logger.info(`Order ${orderId} successfully updated to 'paid' status.`);
         return { success: true, message: `Order ${orderId} marked as paid.` };
     } catch (error) {
@@ -123,7 +137,7 @@ const reserveStock = async (items, orderId) => {
 /**
  * Create a new order
  */
-const createOrder = async (username, items) => {
+const createOrder = async (user, items) => {
     const productPriceMap = {};
 
     for (const item of items) {
@@ -143,8 +157,8 @@ const createOrder = async (username, items) => {
             0
         ) * 100
     ) / 100;
-
-    const order = new Order({ username, items, totalPrice, status: 'pending' });
+    const{username, email} = user;
+    const order = new Order({ username, email, items, totalPrice, status: 'pending' });
     const orderId =  order._id.toString();
     await reserveStock(items, orderId); // Throws error if stock reservation fails
     await order.save();

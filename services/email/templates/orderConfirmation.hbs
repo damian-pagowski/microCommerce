@@ -1,0 +1,18 @@
+Hi {{username}},
+
+Thank you for your order! Here are the details:
+
+Order ID: {{orderId}}
+Date: {{orderDate}}
+
+Items:
+{{#each items}}
+- {{this.name}} x {{this.quantity}}: ${{this.price}}
+{{/each}}
+
+Total: ${{totalPrice}}
+
+We’ll notify you when your order is shipped.
+
+Thanks,  
+The MicroCommerce Team

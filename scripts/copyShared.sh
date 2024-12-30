@@ -8,6 +8,8 @@ SERVICES=(
   "./services/product"
   "./services/user"
   "./services/payment"
+  "./services/email"
+
 )
 
 if [ ! -d "$SHARED_DIR" ]; then

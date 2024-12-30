@@ -12,9 +12,9 @@ module.exports = async function (fastify, opts) {
     }],
   }, async (req, reply) => {
     const { items } = req.body;
-    const username = req.user.username;
+    const user = req.user;
 
-    const order = await createOrder(username, items);
+    const order = await createOrder(user, items);
     reply.status(201).send({ success: true, order });
   });
 

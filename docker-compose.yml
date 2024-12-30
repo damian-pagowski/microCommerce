@@ -73,7 +73,25 @@ services:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
     ports:
       - "3035:3035"
-      
+
+  email-service:
+    build:
+      context: ./services/email
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - PORT=3036
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - RABBITMQ_URL=${RABBITMQ_URL}
+    ports:
+      - "3036:3036"
+    depends_on:
+      - order-service
+      - payment-service
+
   nginx:
     image: nginx:latest
     container_name: nginx
@@ -87,3 +105,4 @@ services:
       - product-service
       - user-service
       - payment-service
+      - email-service

@@ -7,6 +7,15 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "email",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/services/email/server.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "inventory",
             "skipFiles": [
                 "<node_internals>/**"

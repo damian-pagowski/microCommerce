@@ -34,6 +34,10 @@
 - **Node.js** installed
 - **MongoDB Atlas** account
 - **CloudAMQP** account for RabbitMQ
+- **mailhog** installed to fake Email Sending
+```bash
+brew update && brew install mailhog
+```
 
 ## Running Microservices with Docker
 

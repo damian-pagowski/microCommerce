@@ -7,24 +7,29 @@ const logger = getLogger();
 
 // Create a transporter
 const createTransporter = () => {
+    const devCfg  = {
+        host: '127.0.0.1',
+        port: 1025,
+        secure: false
+    };
+
+    const prodCfg = {
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT,
+        secure: true,
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASSWORD,
+        },
+    };
     if (process.env.NODE_ENV === 'production') {
-        return nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: process.env.SMTP_PORT,
-            secure: true,
-            auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASSWORD,
-            },
-        });
+        return nodemailer.createTransport(prodCfg);
     } else {
-        const nodemailermock = require('nodemailer-mock');
-        const transport = nodemailermock.createTransport();
-        return transport;
+        return nodemailer.createTransport(devCfg);
+
     }
 };
-// TODO: Uncomment the following line to create a transporter
-// const transporter = createTransporter();
+const transporter = createTransporter();
 
 const sendOrderConfirmationEmail = async (to, orderDetails) => {
     try {
@@ -38,9 +43,7 @@ const sendOrderConfirmationEmail = async (to, orderDetails) => {
             subject: `Order Confirmation - Order #${orderDetails.orderId}`,
             text: emailBody,
         };
-        // TODO: Uncomment the following line to send the email
-        const info = { messageId:mailOptions }
-        //  const info = await transporter.sendMail(mailOptions);
+         const info = await transporter.sendMail(mailOptions);
 
         logger.info({ to, orderId: orderDetails.orderId, messageId: info.messageId }, 'Email sent successfully');
         return info;

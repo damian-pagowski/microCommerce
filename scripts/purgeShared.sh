@@ -1,6 +1,6 @@
 #!/bin/bash
 
-services=(inventory order product user payment email)
+services=(inventory order product user payment email review)
 
 for service in "${services[@]}"; do
   target="./services/$service/shared"

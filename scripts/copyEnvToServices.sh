@@ -9,6 +9,7 @@ SERVICES=(
   "./services/user"
   "./services/payment"
   "./services/email"
+  "./services/review"
 
 )
 

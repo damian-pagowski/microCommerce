@@ -92,6 +92,23 @@ services:
       - order-service
       - payment-service
 
+  review-service:
+    build:
+      context: ./services/review
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - PORT=3037
+      - MONGO_URI=${MONGO_URI}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    ports:
+      - "3037:3037"
+    depends_on:
+      - product-service
+      - user-service
+
   nginx:
     image: nginx:latest
     container_name: nginx
@@ -106,3 +123,4 @@ services:
       - user-service
       - payment-service
       - email-service
+      - review-service

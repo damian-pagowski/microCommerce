@@ -7,6 +7,15 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "review",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/services/review/server.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "email",
             "skipFiles": [
                 "<node_internals>/**"

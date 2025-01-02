@@ -56,6 +56,7 @@ const generateToken = (user) => {
     {
       username: user.username,
       email: user.email,
+      role: user.role,
     },
     JWT_SECRET,
     { expiresIn: TOKEN_EXPIRATION, algorithm: 'HS256' }

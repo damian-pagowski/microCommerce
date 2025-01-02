@@ -44,4 +44,20 @@ module.exports = async function (fastify, opts) {
 
         reply.status(200).send({ success: true, reviews });
     });
+
+    // Update review status (admin only)
+    fastify.patch('/reviews/:id/status', {
+        preHandler: [fastify.authenticate, async (request) => {
+            if (request.user.role !== 'admin') {
+                throw new ValidationError('Unauthorized: Only admins can update review status');
+            }
+        }],
+    }, async (request, reply) => {
+        const { id } = request.params;
+        const { status } = request.body;
+
+        const updatedReview = await reviewController.updateReviewStatus(id, status);
+
+        reply.status(200).send({ success: true, review: updatedReview });
+    });
 };

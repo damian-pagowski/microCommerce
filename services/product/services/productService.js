@@ -42,6 +42,8 @@ const getProductById = async (productId) => {
  */
 const createProduct = async (productData) => {
   try {
+    const lastProduct = await Product.findOne().sort({ productId: -1 }).exec();
+    productData.productId = lastProduct ? lastProduct.productId + 1 : 1;
     const newProduct = new Product(productData);
     const savedProduct = await newProduct.save();
     await updateProductCache();

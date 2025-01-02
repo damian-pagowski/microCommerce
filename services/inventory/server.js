@@ -1,95 +1,42 @@
 require('dotenv').config();
+const getLoggerConfig = require('./shared/utils/loggerConfig');
 const fastify = require('fastify')({
-  logger:
-    process.env.NODE_ENV === 'production'
-      ? true
-      : {
-        transport: {
-          target: 'pino-pretty',
-          options: {
-            colorize: true,
-          },
-        },
-      },
+  logger: getLoggerConfig()
 });
-const { setLogger, getLogger } = require('./shared/utils/logger');
+const { setLogger } = require('./shared/utils/logger');
 setLogger(fastify);
 const corsPlugin = require('./shared/plugins/cors');
 const mongoosePlugin = require('./shared/plugins/mongoose');
+const metricsPlugin = require('./shared/plugins/metrics');
+const initializeMessageQueue = require('./shared/plugins/rabbitmq');
 const inventoryRoutes = require('./routes/inventoryRoutes');
-const { connectQueue, consumeMessage } = require('./shared/queues/queueService');
 const { processInventoryMessage } = require('./services/inventoryService');
+const healthCheckPlugin = require('./shared/plugins/healthCheck');
+
 const PORT = process.env.PORT || 3031;
-// logger
-const logger = getLogger();
-// prometheus client
-const client = require('prom-client');
 
-// Create a Registry to register metrics
-const register = new client.Registry();
-client.collectDefaultMetrics({ register });
-
-// Example: Custom histogram for HTTP request durations
-const httpRequestDuration = new client.Histogram({
-  name: 'http_request_duration_seconds',
-  help: 'Duration of HTTP requests in seconds',
-  labelNames: ['method', 'route', 'status'],
-});
-register.registerMetric(httpRequestDuration);
-
-// Middleware to track request durations
-fastify.addHook('onRequest', async (request, reply) => {
-  request.startTimer = httpRequestDuration.startTimer({
-    method: request.method,
-    route: request.routerPath || 'unknown',
-  });
-});
-
-fastify.addHook('onResponse', async (request, reply) => {
-  if (request.startTimer) {
-    request.startTimer({ status: reply.statusCode });
-  }
-});
-
-// Global Error Handler
-fastify.setErrorHandler((error, request, reply) => {
-  const statusCode = error.statusCode || 500;
-  const response = {
-    statusCode,
-    message: error.message || 'An unexpected error occurred',
-  };
-  if (error.fields) {
-    response.details = error.fields;
-  }
-  logger.error(error);
-  reply.status(statusCode).send(response);
-});
+// Register shared plugins
 fastify.register(corsPlugin);
 fastify.register(mongoosePlugin);
-// Register Routes
-fastify.register(inventoryRoutes);
-// healthcheck
-fastify.get('/', async (request, reply) => {
-  reply.send({ status: 'ok', message: 'Service is running' });
-});
-// metrics
-fastify.get('/metrics', async (request, reply) => {
-  reply.header('Content-Type', register.contentType);
-  return register.metrics();
-});
+fastify.register(metricsPlugin);
 
-// Start Server
+// Register inventory routes
+fastify.register(inventoryRoutes);
+
+// healthcheck route
+fastify.register(healthCheckPlugin);
+
+// Start the server and initialize RabbitMQ
 const startServer = async () => {
   try {
-    // Connect to RabbitMQ and consume messages
-    await connectQueue();
-    logger.info('RabbitMQ connected.');
-    await consumeMessage('inventory.queue', processInventoryMessage);
+    // Initialize RabbitMQ and consume inventory messages
+    await initializeMessageQueue('inventory.queue', processInventoryMessage);
+
     // Start the Fastify server
     await fastify.listen({ port: PORT, host: '0.0.0.0' });
-    logger.info(`Server is running at http://localhost:${PORT}`);
-  } catch (err) {
-    logger.error('Failed to start server:', err);
+    fastify.log.info(`Server is running at http://localhost:${PORT}`);
+  } catch (error) {
+    fastify.log.error('Failed to start server:', error);
     process.exit(1);
   }
 };

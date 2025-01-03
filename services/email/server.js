@@ -9,6 +9,12 @@ setLogger(fastify);
 const initializeMessageQueue = require('./shared/plugins/rabbitmq');
 const { sendOrderConfirmationEmail } = require('./services/emailService');
 const healthCheckPlugin = require('./shared/plugins/healthCheck');
+const cors = require('@fastify/cors');
+fastify.register(cors, {
+  // TODO: use configuration file to set allowed origins
+  origin: ['http://localhost:3001','http://localhost:3000', '127.0.0.1:3000' ],
+  credentials: true,
+});
 
 // healthcheck route
 fastify.register(healthCheckPlugin);

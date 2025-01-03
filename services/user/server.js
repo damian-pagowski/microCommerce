@@ -7,17 +7,21 @@ const { setLogger } = require('./shared/utils/logger');
 setLogger(fastify);
 
 // Plugins
-const corsPlugin = require('./shared/plugins/cors');
 const mongoosePlugin = require('./shared/plugins/mongoose');
 const jwtPlugin = require('./shared/plugins/jwt');
 const metricsPlugin = require('./shared/plugins/metrics');
 const healthCheckPlugin = require('./shared/plugins/healthCheck');
+const cors = require('@fastify/cors');
+fastify.register(cors, {
+  // TODO: use configuration file to set allowed origins
+  origin: ['http://localhost:3001','http://localhost:3000', '127.0.0.1:3000' ],
+  credentials: true,
+});
 
 // Routes
 const userRoutes = require('./routes/userRoutes');
 
 // Register Plugins
-fastify.register(corsPlugin);
 fastify.register(mongoosePlugin);
 fastify.register(jwtPlugin);
 fastify.register(metricsPlugin);
